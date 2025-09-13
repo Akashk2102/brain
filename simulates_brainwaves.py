@@ -49,15 +49,41 @@ def compute_band_powers(raw, fs=256):
 
 # WebSocket server for real-time streaming
 async def handler(websocket):
+    current_state = 'relaxed'  # Default
     while True:
-        raw, ts = simulate_eeg(state='relaxed')  # Change 'relaxed' to other states as needed
-        bands = compute_band_powers(raw)
-        payload = {'timestamp': ts, **bands}
+        try:
+            message = await asyncio.wait_for(websocket.recv(), timeout=1)  # Listen for client messages
+            if message:
+                data = json.loads(message)
+                if 'state' in data:
+                    current_state = data['state']  # Update state from client
+        except asyncio.TimeoutError:
+            pass  # Continue if no message
+        except websockets.exceptions.ConnectionClosedError as e:
+            print(f"Server: Connection closed ({e}). Waiting 3 s and accepting again…")
+            await asyncio.sleep(3)
+            return  # Exit handler – the outer websockets.serve() will accept a new client
+
+        try:
+            raw, ts = simulate_eeg(state=current_state)
+            bands = compute_band_powers(raw)
+        except Exception as e:
+            print("EEG generator failed:", e)
+            continue  # Keeps the handler alive
+
+        payload = {'timestamp': ts, **bands, 'state': current_state}
         await websocket.send(json.dumps(payload))
         await asyncio.sleep(1)
 
+# Start the server with ping settings
 async def main():
-    async with websockets.serve(handler, "0.0.0.0", 8765):
+    async with websockets.serve(
+        handler,
+        "0.0.0.0",
+        8765,
+        ping_interval=30,   # Send ping every 30 seconds
+        ping_timeout=90     # Wait 90 seconds for pong
+    ):
         await asyncio.Future()  # Keeps the server running forever
 
 if __name__ == "__main__":

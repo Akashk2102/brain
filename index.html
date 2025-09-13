@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindPrint - Assistive Technology Platform</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-blue: #4A90E2;
+            --soft-blue: #E3F2FD;
+            --accent-teal: #26A69A;
+            --light-gray: #F8F9FA;
+            --medium-gray: #E9ECEF;
+            --dark-gray: #495057;
+            --white: #FFFFFF;
+            --success-green: #4CAF50;
+            --warning-amber: #FF9800;
+            --shadow: 0 4px 20px rgba(74, 144, 226, 0.1);
+            --shadow-hover: 0 8px 30px rgba(74, 144, 226, 0.15);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--dark-gray);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 1rem 0;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .navbar.scrolled {
+            background: rgba(255, 255, 255, 0.98);
+            padding: 0.5rem 0;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo::before {
+            content: "🧠";
+            animation: pulse 2s infinite;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark-gray);
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-blue);
+            transform: translateY(-2px);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-blue);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+        }
+
+        .mobile-menu span {
+            width: 25px;
+            height: 3px;
+            background: var(--primary-blue);
+            margin: 3px 0;
+            transition: 0.3s;
+        }
+
+        /* Hero Section */
+        .hero {
+            margin-top: 80px;
+            padding: 4rem 0;
+            text-align: center;
+            background: linear-gradient(135deg, var(--soft-blue) 0%, rgba(255, 255, 255, 0.9) 100%);
+        }
+
+        .hero-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+            animation: fadeInUp 1s ease;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--dark-gray);
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            animation: fadeInUp 1s ease 0.2s both;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-teal));
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+            animation: fadeInUp 1s ease 0.4s both;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        /* Section Grid */
+        .sections-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .section-card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInScale 0.8s ease;
+        }
+
+        .section-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-blue), var(--accent-teal));
+        }
+
+        .section-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, var(--soft-blue), rgba(255, 255, 255, 0.8));
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+        }
+
+        .section-description {
+            color: var(--dark-gray);
+            margin-bottom: 1.5rem;
+        }
+
+        .placeholder-area {
+            min-height: 200px;
+            background: var(--light-gray);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed var(--medium-gray);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .placeholder-content {
+            text-align: center;
+            color: var(--dark-gray);
+            z-index: 2;
+        }
+
+        .placeholder-area::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(74, 144, 226, 0.05), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        /* Interactive Elements */
+        .interactive-demo {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .demo-controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .demo-button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 25px;
+            background: var(--primary-blue);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .demo-button:hover {
+            background: var(--accent-teal);
+            transform: scale(1.05);
+        }
+
+        .demo-button.active {
+            background: var(--success-green);
+        }
+
+        /* Status Indicators */
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .status-card {
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .status-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator.online {
+            background: var(--success-green);
+        }
+
+        .status-indicator.pending {
+            background: var(--warning-amber);
+        }
+
+        .status-indicator.offline {
+            background: #ccc;
+        }
+
+        /* About Section */
+        .about-section {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .feature-item {
+            text-align: center;
+            padding: 1.5rem;
+            border-radius: 15px;
+            background: var(--light-gray);
+            transition: all 0.3s ease;
+        }
+
+        .feature-item:hover {
+            background: var(--soft-blue);
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            animation: bounce 2s infinite;
+        }
+
+        /* Loading Animation */
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--soft-blue);
+            border-top: 4px solid var(--primary-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .mobile-menu {
+                display: flex;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .sections-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .demo-controls {
+                flex-direction: column;
+            }
+
+            .nav-container {
+                padding: 0 1rem;
+            }
+
+            .main-content {
+                padding: 2rem 1rem;
+            }
+        }
+
+        /* Dashboard Integration Styles */
+        .dashboard-container {
+            width: 100%;
+            height: 600px;
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(74, 144, 226, 0.15);
+            background: var(--white);
+        }
+
+        .dashboard-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .dashboard-iframe:hover {
+            box-shadow: 0 8px 30px rgba(74, 144, 226, 0.2);
+        }
+
+        .dashboard-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        /* Accessibility */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <div class="logo">MindPrint</div>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#eye-tracking">Eye Tracking</a></li>
+                <li><a href="#eeg-analysis">EEG Analysis</a></li>
+                <li><a href="#smart-assistance">Smart Assistance</a></li>
+                <li><a href="#dashboard">Brain Dashboard</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+            <div class="mobile-menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-container">
+            <h1>Empowering Through Technology</h1>
+            <p>Advanced assistive technology combining eye-tracking, EEG analysis, and AI to enhance accessibility and independence for people with special needs.</p>
+            <a href="#about" class="cta-button">Learn More</a>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- System Status -->
+        <div class="status-grid">
+            <div class="status-card">
+                <div class="status-indicator online"></div>
+                <h3>Eye Tracking</h3>
+                <p>Active & Calibrated</p>
+            </div>
+            <div class="status-card">
+                <div class="status-indicator pending"></div>
+                <h3>EEG Monitoring</h3>
+                <p>Collecting Data</p>
+            </div>
+            <div class="status-card">
+                <div class="status-indicator online"></div>
+                <h3>AI Assistant</h3>
+                <p>Ready</p>
+            </div>
+            <div class="status-card">
+                <div class="status-indicator online"></div>
+                <h3>System Health</h3>
+                <p>Optimal</p>
+            </div>
+        </div>
+
+        <!-- Interactive Demo -->
+        <div class="interactive-demo">
+            <h2 style="color: var(--primary-blue); margin-bottom: 1rem;">Interactive Demo Controls</h2>
+            <div class="demo-controls">
+                <button class="demo-button" onclick="toggleDemo('eye-tracking')">Start Eye Tracking Demo</button>
+                <button class="demo-button" onclick="toggleDemo('eeg')">Simulate EEG Data</button>
+                <button class="demo-button" onclick="toggleDemo('ai')">Activate AI Assistant</button>
+                <button class="demo-button" onclick="startBrainwaveSimulation()">Start Brain Dashboard</button>
+                <button class="demo-button" onclick="resetDemo()">Reset All</button>
+            </div>
+        </div>
+
+        <!-- Main Sections Grid -->
+        <div class="sections-grid">
+            <!-- Eye Tracking Section -->
+            <div class="section-card" id="eye-tracking">
+                <div class="section-header">
+                    <div class="section-icon">👁️</div>
+                    <h2 class="section-title">Eye Tracking Visualization</h2>
+                </div>
+                <p class="section-description">
+                    Real-time eye movement tracking and gaze pattern analysis to enable hands-free computer interaction and communication.
+                </p>
+                <div class="placeholder-area" id="eye-tracking-placeholder">
+                    <div class="placeholder-content">
+                        <div class="loading-spinner"></div>
+                        <p><strong>Python Integration Point</strong><br>
+                        Eye tracking algorithms and visualization will be connected here</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EEG Analysis Section -->
+            <div class="section-card" id="eeg-analysis">
+                <div class="section-header">
+                    <div class="section-icon">🧠</div>
+                    <h2 class="section-title">EEG Data Analysis</h2>
+                </div>
+                <p class="section-description">
+                    Advanced brainwave monitoring and analysis for brain-computer interface applications and cognitive state assessment.
+                </p>
+                <div class="placeholder-area" id="eeg-placeholder">
+                    <div class="placeholder-content">
+                        <div class="loading-spinner"></div>
+                        <p><strong>Python Integration Point</strong><br>
+                        EEG signal processing and visualization charts will be displayed here</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Smart Assistance Section -->
+            <div class="section-card" id="smart-assistance">
+                <div class="section-header">
+                    <div class="section-icon">🤖</div>
+                    <h2 class="section-title">Smart Assistance</h2>
+                </div>
+                <p class="section-description">
+                    AI-powered assistance using advanced language models to provide intelligent support and communication aid.
+                </p>
+                <div class="placeholder-area" id="ai-placeholder">
+                    <div class="placeholder-content">
+                        <div class="loading-spinner"></div>
+                        <p><strong>Future AI Integration</strong><br>
+                        Intelligent chat interface and assistance features will be implemented here</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Brain Dashboard Section -->
+            <div class="section-card" id="dashboard">
+                <div class="section-header">
+                    <div class="section-icon">📊</div>
+                    <h2 class="section-title">Integrated Brain Dashboard</h2>
+                </div>
+                <p class="section-description">
+                    Advanced brainwave analysis dashboard with real-time data visualization, machine learning predictions, and training data management.
+                </p>
+                
+                <!-- Dashboard Controls -->
+                <div class="demo-controls" style="margin-bottom: 2rem;">
+                    <button class="demo-button" onclick="startBrainwaveSimulation()">Start Brainwave Simulation</button>
+                    <button class="demo-button" onclick="stopBrainwaveSimulation()">Stop Simulation</button>
+                    <button class="demo-button" onclick="generateTrainingData()">Generate Training Data</button>
+                    <button class="demo-button" onclick="reloadMLModel()">Reload ML Model</button>
+                </div>
+
+                <!-- State Selector -->
+                <div style="margin-bottom: 2rem;">
+                    <label for="brainwave-state" style="font-weight: 600; margin-right: 1rem;">Brainwave State:</label>
+                    <select id="brainwave-state" onchange="updateBrainwaveState()" style="padding: 0.5rem; border-radius: 8px; border: 1px solid #4A90E2;">
+                        <option value="relaxed">Relaxed</option>
+                        <option value="hungry">Hungry</option>
+                        <option value="thirsty">Thirsty</option>
+                        <option value="depressed">Depressed</option>
+                        <option value="bored">Bored</option>
+                        <option value="emergency">Emergency</option>
+                    </select>
+                </div>
+
+                <!-- Real-time Brainwave Display -->
+                <div id="brainwave-display" class="placeholder-area">
+                    <div class="placeholder-content">
+                        <div class="loading-spinner"></div>
+                        <p><strong>Brainwave Dashboard Ready</strong><br>
+                        Click "Start Brainwave Simulation" to begin real-time monitoring</p>
+                    </div>
+                </div>
+
+                <!-- Training Data Management -->
+                <div id="training-section" style="margin-top: 2rem; display: none;">
+                    <h3 style="color: var(--primary-blue); margin-bottom: 1rem;">Training Data Management</h3>
+                    <div class="demo-controls">
+                        <button class="demo-button" onclick="startPredictionStream()">Start Prediction Stream</button>
+                        <button class="demo-button" onclick="startRealTimePrediction()">Real-time Prediction</button>
+                        <button class="demo-button" onclick="stopRealTimePrediction()">Stop Real-time</button>
+                    </div>
+                    
+                    <div id="prediction-results" style="margin-top: 1rem;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- About Section -->
+        <section class="about-section" id="about">
+            <h2 style="color: var(--primary-blue); text-align: center; margin-bottom: 2rem;">About NeuroAssist</h2>
+            <p style="text-align: center; font-size: 1.1rem; margin-bottom: 2rem;">
+                NeuroAssist is a comprehensive assistive technology platform designed to enhance the quality of life for individuals with special needs. Our integrated approach combines cutting-edge eye-tracking technology, advanced EEG analysis, and AI-powered assistance to create personalized, accessible solutions.
+            </p>
+            
+            <div class="features-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">🎯</div>
+                    <h3>Precision Tracking</h3>
+                    <p>High-accuracy eye movement detection for seamless computer control</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Real-time Analysis</h3>
+                    <p>Instant EEG processing for immediate feedback and response</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🧬</div>
+                    <h3>Adaptive Learning</h3>
+                    <p>AI that learns and adapts to individual user patterns and preferences</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🌐</div>
+                    <h3>Universal Access</h3>
+                    <p>Designed for users with various disabilities and accessibility needs</p>
+                </div>
+            </div>
+
+            <div style="background: var(--soft-blue); padding: 2rem; border-radius: 15px; margin-top: 2rem; text-align: center;">
+                <h3 style="color: var(--primary-blue); margin-bottom: 1rem;">Healthcare Benefits</h3>
+                <p>Our technology enables independence for individuals with motor disabilities, communication disorders, and neurological conditions. By providing alternative input methods and intelligent assistance, we help users overcome barriers to technology access and social interaction.</p>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        async function startEyeTracking() {
+    await fetch('http://localhost:5000/api/eye-tracking/start', { method: 'POST' });
+}
+
+async function stopEyeTracking() {
+    await fetch('http://localhost:5000/api/eye-tracking/stop', { method: 'POST' });
+}
+
+        // Global state management
+        const appState = {
+            eyeTrackingActive: false,
+            eegMonitoring: false,
+            aiAssistantActive: false
+        };
+
+        // Navigation scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Demo control functions
+        function toggleDemo(type) {
+    const button = event.target;
+
+    switch (type) {
+        case 'eye-tracking':
+            appState.eyeTrackingActive = !appState.eyeTrackingActive;
+
+            if (appState.eyeTrackingActive) {
+                startEyeTracking();
+            } else {
+                stopEyeTracking();
+            }
+
+            updateEyeTrackingDemo(appState.eyeTrackingActive);
+            button.textContent = appState.eyeTrackingActive ? 'Stop Eye Tracking' : 'Start Eye Tracking Demo';
+            button.classList.toggle('active');
+            break;
+
+        case 'eeg':
+            appState.eegMonitoring = !appState.eegMonitoring;
+            updateEEGDemo(appState.eegMonitoring);
+            button.textContent = appState.eegMonitoring ? 'Stop EEG Simulation' : 'Simulate EEG Data';
+            button.classList.toggle('active');
+            break;
+
+        case 'ai':
+            appState.aiAssistantActive = !appState.aiAssistantActive;
+            updateAIDemo(appState.aiAssistantActive);
+            button.textContent = appState.aiAssistantActive ? 'Deactivate AI' : 'Activate AI Assistant';
+            button.classList.toggle('active');
+            break;
+    }
+}
+
+
+        function resetDemo() {
+            // Reset all states
+            appState.eyeTrackingActive = false;
+            appState.eegMonitoring = false;
+            appState.aiAssistantActive = false;
+
+            // Reset all placeholders
+            updateEyeTrackingDemo(false);
+            updateEEGDemo(false);
+            updateAIDemo(false);
+            stopBrainwaveSimulation();
+            stopRealTimePrediction();
+
+            // Reset all buttons
+            document.querySelectorAll('.demo-button').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent.includes('Stop') || btn.textContent.includes('Deactivate')) {
+                    if (btn.textContent.includes('Eye Tracking')) {
+                        btn.textContent = 'Start Eye Tracking Demo';
+                    } else if (btn.textContent.includes('EEG')) {
+                        btn.textContent = 'Simulate EEG Data';
+                    } else if (btn.textContent.includes('AI')) {
+                        btn.textContent = 'Activate AI Assistant';
+                    } else if (btn.textContent.includes('Brain Dashboard')) {
+                        btn.textContent = 'Start Brain Dashboard';
+                    }
+                }
+            });
+        }
+
+        // Integrated Dashboard Functions
+        let brainwaveInterval = null;
+        let predictionInterval = null;
+        let isBrainwaveActive = false;
+        let isRealTimePrediction = false;
+
+        function startBrainwaveSimulation() {
+            isBrainwaveActive = true;
+            const display = document.getElementById('brainwave-display');
+            display.innerHTML = `
+                <div style="text-align: center;">
+                    <h3 style="color: var(--primary-blue); margin-bottom: 1rem;">🧠 Real-time Brainwave Data</h3>
+                    <div id="brainwave-chart" style="height: 300px; background: var(--light-gray); border-radius: 12px; padding: 1rem; margin-bottom: 1rem;">
+                        <canvas id="brainwave-canvas" width="400" height="200"></canvas>
+                    </div>
+                    <div id="brainwave-stats" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; margin-top: 1rem;">
+                        <div class="brainwave-metric">
+                            <h4>Delta</h4>
+                            <div id="delta-value">0.00</div>
+                        </div>
+                        <div class="brainwave-metric">
+                            <h4>Theta</h4>
+                            <div id="theta-value">0.00</div>
+                        </div>
+                        <div class="brainwave-metric">
+                            <h4>Alpha</h4>
+                            <div id="alpha-value">0.00</div>
+                        </div>
+                        <div class="brainwave-metric">
+                            <h4>Beta</h4>
+                            <div id="beta-value">0.00</div>
+                        </div>
+                        <div class="brainwave-metric">
+                            <h4>Gamma</h4>
+                            <div id="gamma-value">0.00</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Add CSS for brainwave metrics
+            const style = document.createElement('style');
+            style.textContent = `
+                .brainwave-metric {
+                    background: var(--white);
+                    padding: 1rem;
+                    border-radius: 8px;
+                    text-align: center;
+                    box-shadow: var(--shadow);
+                }
+                .brainwave-metric h4 {
+                    color: var(--primary-blue);
+                    margin-bottom: 0.5rem;
+                }
+                .brainwave-metric div {
+                    font-size: 1.2rem;
+                    font-weight: 600;
+                    color: var(--dark-gray);
+                }
+            `;
+            document.head.appendChild(style);
+
+            // Start polling for brainwave data
+            brainwaveInterval = setInterval(fetchBrainwaveData, 1000);
+            document.getElementById('training-section').style.display = 'block';
+        }
+
+        function stopBrainwaveSimulation() {
+            isBrainwaveActive = false;
+            if (brainwaveInterval) {
+                clearInterval(brainwaveInterval);
+            }
+            const display = document.getElementById('brainwave-display');
+            display.innerHTML = `
+                <div class="placeholder-content">
+                    <div class="loading-spinner"></div>
+                    <p><strong>Brainwave Dashboard Ready</strong><br>
+                    Click "Start Brainwave Simulation" to begin real-time monitoring</p>
+                </div>
+            `;
+            document.getElementById('training-section').style.display = 'none';
+        }
+
+        function fetchBrainwaveData() {
+            fetch('/api/brainwave-data')
+                .then(response => response.json())
+                .then(data => {
+                    if (data && !data.error) {
+                        updateBrainwaveDisplay(data);
+                        drawBrainwaveChart(data);
+                    }
+                })
+                .catch(error => console.error('Error fetching brainwave data:', error));
+        }
+
+        function updateBrainwaveDisplay(data) {
+            document.getElementById('delta-value').textContent = data.delta.toFixed(3);
+            document.getElementById('theta-value').textContent = data.theta.toFixed(3);
+            document.getElementById('alpha-value').textContent = data.alpha.toFixed(3);
+            document.getElementById('beta-value').textContent = data.beta.toFixed(3);
+            document.getElementById('gamma-value').textContent = data.gamma.toFixed(3);
+        }
+
+        function drawBrainwaveChart(data) {
+            const canvas = document.getElementById('brainwave-canvas');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width;
+            const height = canvas.height;
+            
+            ctx.clearRect(0, 0, width, height);
+            
+            const bands = [
+                { name: 'Delta', value: data.delta, color: '#FF6B6B' },
+                { name: 'Theta', value: data.theta, color: '#4ECDC4' },
+                { name: 'Alpha', value: data.alpha, color: '#45B7D1' },
+                { name: 'Beta', value: data.beta, color: '#96CEB4' },
+                { name: 'Gamma', value: data.gamma, color: '#FFEAA7' }
+            ];
+            
+            const barWidth = width / bands.length;
+            
+            bands.forEach((band, index) => {
+                const barHeight = (band.value * height * 0.8);
+                const x = index * barWidth;
+                const y = height - barHeight;
+                
+                ctx.fillStyle = band.color;
+                ctx.fillRect(x + 10, y, barWidth - 20, barHeight);
+                
+                ctx.fillStyle = '#333';
+                ctx.font = '12px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(band.name, x + barWidth/2, height - 5);
+            });
+        }
+
+        function updateBrainwaveState() {
+            const state = document.getElementById('brainwave-state').value;
+            fetch('/api/set-brainwave-state', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ state: state })
+            })
+            .then(response => response.json())
+            .then(data => console.log('Brainwave state updated:', data))
+            .catch(error => console.error('Error updating state:', error));
+        }
+
+        function generateTrainingData() {
+            fetch('/api/generate-training-data', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ n_samples: 100 })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status) {
+                    alert(`✅ Training data generated successfully!\nSamples: ${data.samples}`);
+                } else {
+                    alert(`❌ Error: ${data.error}`);
+                }
+            })
+            .catch(error => {
+                console.error('Error generating training data:', error);
+                alert('❌ Error generating training data');
+            });
+        }
+
+        function reloadMLModel() {
+            fetch('/api/reload-model', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'Model reloaded successfully') {
+                        alert(`✅ Model reloaded successfully!\nData shape: ${data.data_shape}`);
+                    } else {
+                        alert(`❌ Error: ${data.error}`);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error reloading model:', error);
+                    alert('❌ Error reloading model');
+                });
+        }
+
+        function startPredictionStream() {
+            // This would implement the prediction stream functionality
+            alert('🚀 Prediction stream started! Check console for results.');
+        }
+
+        function startRealTimePrediction() {
+            isRealTimePrediction = true;
+            const results = document.getElementById('prediction-results');
+            results.innerHTML = `
+                <h4 style="color: var(--primary-blue);">Real-time Prediction Results</h4>
+                <div id="prediction-display" style="background: var(--white); padding: 1rem; border-radius: 8px; box-shadow: var(--shadow);">
+                    <p>Starting real-time prediction...</p>
+                </div>
+            `;
+            
+            predictionInterval = setInterval(() => {
+                if (isRealTimePrediction) {
+                    // Generate random brainwave data for prediction
+                    const brainwaveData = {
+                        ch1: Math.random(),
+                        ch2: Math.random(),
+                        ch3: Math.random(),
+                        ch4: Math.random(),
+                        ch5: Math.random(),
+                        ch6: Math.random(),
+                        ch7: Math.random(),
+                        ch8: Math.random()
+                    };
+                    
+                    fetch('/api/predict-thought', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(brainwaveData)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        const display = document.getElementById('prediction-display');
+                        display.innerHTML = `
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+                                <div><strong>Predicted:</strong> ${data.thought}</div>
+                                <div><strong>Confidence:</strong> ${(data.confidence * 100).toFixed(1)}%</div>
+                                <div><strong>Time:</strong> ${new Date().toLocaleTimeString()}</div>
+                            </div>
+                        `;
+                    })
+                    .catch(error => console.error('Prediction error:', error));
+                }
+            }, 2000);
+        }
+
+        function stopRealTimePrediction() {
+            isRealTimePrediction = false;
+            if (predictionInterval) {
+                clearInterval(predictionInterval);
+            }
+            const display = document.getElementById('prediction-display');
+            if (display) {
+                display.innerHTML = '<p>Real-time prediction stopped.</p>';
+            }
+        }
+
+        let eyeTrackingInterval = null;
+
+function updateEyeTrackingDemo(active) {
+    const placeholder = document.getElementById('eye-tracking-placeholder');
+    
+    if (active) {
+        placeholder.innerHTML = `
+            <div id="eye-tracking-content" style="text-align: center;">
+                <div style="display:flex;justify-content:center;margin-bottom:1rem;">
+                    <img id="eye-tracking-video" src="http://localhost:5000/video_feed" alt="Webcam Feed" style="max-width:340px;max-height:220px;border-radius:16px;border:2px solid #4A90E2;box-shadow:0 2px 12px rgba(74,144,226,0.12);margin-bottom:1rem;" />
+                </div>
+                <div id="eye-options-ui"></div>
+                <div id="eye-tracking-stats"></div>
+            </div>
+        `;
+
+        // Poll the Python backend API every second
+        eyeTrackingInterval = setInterval(async () => {
+            try {
+                const res = await fetch('http://localhost:5000/api/eye-tracking');
+                const data = await res.json();
+
+                // Options for display
+                const options = ['Food', 'Water', 'Emergency', 'Songs'];
+                let optionsHtml = '<div class="eye-options-row" style="display:flex;justify-content:center;gap:2rem;margin:1.5rem 0;">';
+                options.forEach((opt, idx) => {
+                    const isFocused = data.focus_index === idx;
+                    const isSelected = data.selected_option === opt;
+                    optionsHtml += `<div class="eye-option${isFocused ? ' focused' : ''}${isSelected ? ' selected' : ''}" style="padding:1.2rem 2.2rem;border-radius:18px;font-size:1.2rem;font-weight:600;box-shadow:0 2px 8px rgba(74,144,226,0.08);background:${isSelected ? '#4CAF50' : isFocused ? '#E3F2FD' : '#fff'};color:${isSelected ? '#fff' : isFocused ? '#1976D2' : '#495057'};border:${isFocused ? '2px solid #4A90E2' : '2px solid #E9ECEF'};transition:all 0.2s;">${opt}</div>`;
+                });
+                optionsHtml += '</div>';
+                document.getElementById('eye-options-ui').innerHTML = optionsHtml;
+
+                document.getElementById('eye-tracking-stats').innerHTML = `
+                    <p><strong>Gaze X:</strong> ${data.gx.toFixed(2)}</p>
+                    <p><strong>Gaze Y:</strong> ${data.gy.toFixed(2)}</p>
+                    <p><strong>Focus On:</strong> ${options[data.focus_index] || 'None'}</p>
+                    <p><strong>Eyes Closed:</strong> ${data.eyes_closed}</p>
+                    <p style="font-size:1.3rem;margin-top:1rem;"><strong>Selected Option:</strong> <span style="color:#4CAF50;font-weight:700;">${data.selected_option || 'None'}</span></p>
+                `;
+
+                // Add styles for focused/selected options
+                const styleId = 'eye-options-style';
+                if (!document.getElementById(styleId)) {
+                    const style = document.createElement('style');
+                    style.id = styleId;
+                    style.textContent = `
+                        .eye-option.focused {
+                            box-shadow: 0 4px 16px rgba(74,144,226,0.18);
+                            background: #E3F2FD !important;
+                            border-color: #4A90E2 !important;
+                            color: #1976D2 !important;
+                        }
+                        .eye-option.selected {
+                            background: #4CAF50 !important;
+                            color: #fff !important;
+                            border-color: #388E3C !important;
+                        }
+                    `;
+                    document.head.appendChild(style);
+                }
+            } catch (err) {
+                console.error('Error fetching eye tracking data:', err);
+                document.getElementById('eye-tracking-content').innerHTML = `
+                    <p style="color: red;">Failed to fetch eye tracking data</p>
+                `;
+            }
+        }, 1000);
+
+    } else {
+        clearInterval(eyeTrackingInterval);
+
+        placeholder.innerHTML = `
+            <div class="placeholder-content">
+                <div class="loading-spinner"></div>
+                <p><strong>Python Integration Point</strong><br>
+                Eye tracking algorithms and visualization will be connected here</p>
+            </div>
+        `;
+    }
+}
+
+
+        function updateEEGDemo(active) {
+            const placeholder = document.getElementById('eeg-placeholder');
+            if (active) {
+                placeholder.innerHTML = `
+                    <div style="text-align: center; width: 100%;">
+                        <div id="eeg-thought-display" style="margin-top:2.5rem;font-size:1.3rem;color:#1976D2;font-weight:600;"></div>
+                    </div>
+                `;
+                // Listen for any key press globally
+                let lastKey = null;
+                document.onkeydown = async function(e) {
+                    // Only process a-z keys
+                    if (e.key.length === 1 && e.key.match(/[a-z]/i)) {
+                        lastKey = e.key.toLowerCase();
+                        const display = document.getElementById('eeg-thought-display');
+                        display.innerHTML = `<span class="loading-spinner" style="vertical-align:middle;margin-right:10px;"></span> Fetching brain waves...`;
+                        setTimeout(async () => {
+                            const res = await fetch('http://localhost:5001/api/eeg-simulate', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ key: lastKey })
+                            });
+                            const data = await res.json();
+                            display.textContent = data.thought ? `Predicted Thought: ${data.thought}` : 'No prediction.';
+                        }, 1200);
+                    }
+                };
+                // Optionally, fetch the latest thought on load
+                fetch('http://localhost:5001/api/eeg-latest')
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.thought) {
+                            document.getElementById('eeg-thought-display').textContent = `Predicted Thought: ${data.thought}`;
+                        }
+                    });
+            } else {
+                placeholder.innerHTML = `
+                    <div class="placeholder-content">
+                        <div class="loading-spinner"></div>
+                        <p><strong>Python Integration Point</strong><br>
+                        EEG signal processing and visualization charts will be displayed here</p>
+                    </div>
+                `;
+                document.onkeydown = null;
+            }
+        }
+
+        function updateAIDemo(active) {
+            const placeholder = document.getElementById('ai-placeholder');
+            if (active) {
+                placeholder.innerHTML = `
+                    <div style="text-align: center; width: 100%; max-width: 500px; margin: 0 auto;">
+                        <div id="ai-chat-window" style="background: #fff; border-radius: 15px; min-height: 180px; max-height: 260px; overflow-y: auto; box-shadow: 0 2px 8px rgba(74,144,226,0.08); padding: 1rem; margin-bottom: 1rem; text-align: left;"></div>
+                        <form id="ai-chat-form" style="display: flex; gap: 0.5rem; align-items: center;">
+                            <input id="ai-chat-input" type="text" placeholder="Type your message..." autocomplete="off" style="flex:1; padding:0.7rem 1rem; border-radius: 20px; border:1px solid #4A90E2; font-size:1rem; outline:none;" />
+                            <button type="button" id="ai-voice-btn" title="Speak" style="background:#4A90E2; border:none; border-radius:50%; width:40px; height:40px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:1.3rem; cursor:pointer;"><span id="ai-voice-icon">🎤</span></button>
+                            <button type="submit" style="background:#4A90E2; color:#fff; border:none; border-radius:20px; padding:0.7rem 1.3rem; font-weight:600; cursor:pointer;">Send</button>
+                        </form>
+                    </div>
+                `;
+                const chatWindow = document.getElementById('ai-chat-window');
+                const chatForm = document.getElementById('ai-chat-form');
+                const chatInput = document.getElementById('ai-chat-input');
+                const voiceBtn = document.getElementById('ai-voice-btn');
+                const voiceIcon = document.getElementById('ai-voice-icon');
+                let recognizing = false;
+                let recognition;
+
+                // Add typing animation style if not already present
+                const styleId = 'ai-typing-style';
+                if (!document.getElementById(styleId)) {
+                    const style = document.createElement('style');
+                    style.id = styleId;
+                    style.textContent = `
+                        @keyframes typing { 0%, 80%, 100% { opacity: 0.2; } 40% { opacity: 1; } }
+                        .ai-msg { background: #E3F2FD; color: #1976D2; border-radius: 12px; padding: 0.7rem 1rem; margin-bottom: 0.5rem; display: inline-block; }
+                        .user-msg { background: #4A90E2; color: #fff; border-radius: 12px; padding: 0.7rem 1rem; margin-bottom: 0.5rem; display: inline-block; align-self: flex-end; }
+                    `;
+                    document.head.appendChild(style);
+                }
+
+                function appendMessage(msg, sender) {
+                    const div = document.createElement('div');
+                    div.className = sender === 'user' ? 'user-msg' : 'ai-msg';
+                    div.textContent = msg;
+                    chatWindow.appendChild(div);
+                    chatWindow.scrollTop = chatWindow.scrollHeight;
+                    // If AI assistant, speak the message
+                    if (sender === 'ai' && 'speechSynthesis' in window) {
+                        const utter = new window.SpeechSynthesisUtterance(msg);
+                        utter.lang = 'en-US';
+                        window.speechSynthesis.speak(utter);
+                    }
+                }
+
+                chatForm.onsubmit = async function(e) {
+                    e.preventDefault();
+                    const msg = chatInput.value.trim();
+                    if (!msg) return;
+                    appendMessage(msg, 'user');
+                    chatInput.value = '';
+                    appendMessage('...', 'ai');
+                    const aiMsgDiv = chatWindow.querySelector('.ai-msg:last-child');
+                    try {
+                        const res = await fetch('http://localhost:5002/api/sa/chat', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ message: msg })
+                        });
+                        if (!res.ok) throw new Error('Network response was not ok');
+                        const data = await res.json();
+                        aiMsgDiv.textContent = data.message || 'Sorry, I could not understand.';
+                        // Speak the AI reply
+                        if (data.message && 'speechSynthesis' in window) {
+                            const utter = new window.SpeechSynthesisUtterance(data.message);
+                            utter.lang = 'en-US';
+                            window.speechSynthesis.speak(utter);
+                        }
+                    } catch (err) {
+                        aiMsgDiv.textContent = 'Error connecting to assistant.';
+                    }
+                };
+
+                // Voice input using browser SpeechRecognition
+                if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                    recognition = new SpeechRecognition();
+                    recognition.lang = 'en-US';
+                    recognition.interimResults = false;
+                    recognition.maxAlternatives = 1;
+
+                    recognition.onstart = function() {
+                        recognizing = true;
+                        voiceIcon.textContent = '🔴';
+                    };
+                    recognition.onend = function() {
+                        recognizing = false;
+                        voiceIcon.textContent = '🎤';
+                    };
+                    recognition.onerror = function() {
+                        recognizing = false;
+                        voiceIcon.textContent = '🎤';
+                    };
+                    recognition.onresult = function(event) {
+    const transcript = event.results[0][0].transcript;
+    appendMessage(transcript, 'user');
+    appendMessage('...', 'ai');
+    const aiMsgDiv = chatWindow.querySelector('.ai-msg:last-child');
+    fetch('http://localhost:5002/api/sa/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: transcript })
+    })
+    .then(res => {
+        if (!res.ok) throw new Error('Network response was not ok: ' + res.status + ' ' + res.statusText);
+        return res.json();
+    })
+    .then(data => {
+        aiMsgDiv.textContent = data.message || 'Sorry, I could not understand.';
+        // Speak the AI reply
+        if (data.message && 'speechSynthesis' in window) {
+            const utter = new window.SpeechSynthesisUtterance(data.message);
+            utter.lang = 'en-US';
+            window.speechSynthesis.speak(utter);
+        }
+    })
+    .catch((err) => {
+        aiMsgDiv.textContent = 'Error connecting to assistant.';
+        console.error('AI Assistant fetch error:', err);
+    });
+};
+                    voiceBtn.onclick = function(e) {
+                        e.preventDefault();
+                        if (recognizing) {
+                            recognition.stop();
+                        } else {
+                            recognition.start();
+                        }
+                    };
+                } else {
+                    voiceBtn.disabled = true;
+                    voiceBtn.title = 'Speech recognition not supported';
+                }
+                        } else {
+                            placeholder.innerHTML = `
+                                <div class="placeholder-content">
+                                    <div class="loading-spinner"></div>
+                                    <p><strong>Future AI Integration</strong><br>
+                                    Intelligent chat interface and assistance features will be implemented here</p>
+                                </div>
+                            `;
+                        }
+                    }
+                </script>
+            </body>
+            </html>
